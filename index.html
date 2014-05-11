@@ -1,0 +1,46 @@
+<!doctype html>
+<html class="no-js" xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml" lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<title>Web Audio API</title>
+
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body { background: black; color: #999; font-family: sans-serif; }
+		h1 { color: #333; }
+
+		.preloader {
+			width: 300px;
+			position: absolute;
+			top: 30%;
+			left: 50%;
+			margin-left: -150px;
+			text-align: center;
+			font-size: 1.3em;
+			font-style: italic;
+		}
+
+		#readout {
+			margin: auto;
+			display: block;
+		}
+
+	</style>
+</head>
+
+<body>
+
+	<div id="container">
+		<main>
+			<p class="preloader">Loading sound&hellip;</p>
+			<canvas id="readout" width="600" height="200"></canvas>
+		</main>
+	</div>
+
+	<script src="script.js"></script>
+</body>
+</html>
