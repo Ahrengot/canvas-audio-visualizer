@@ -29,7 +29,7 @@ updateCanvasSize();
 
 function playSound() {
 	// buffer source has to be recreated for every "play"
-	source = context.createBufferSource( 2, 176400, 176400 );
+	source = context.createBufferSource();
 	source.buffer = buffer;
 	source.connect( context.destination );
 
@@ -40,7 +40,7 @@ function playSound() {
 function createSoundAnalyser() {
 	analyser = context.createAnalyser();
 	analyser.fftSize = DETAIL;
-	analyser.smoothingTimeConstant = 0.8;
+	analyser.smoothingTimeConstant = 0.9;
 
 	source.connect( analyser );
 	analyser.connect( context.destination );
@@ -48,21 +48,37 @@ function createSoundAnalyser() {
 
 function loop() {
 	var freqDomain = new Uint8Array( analyser.frequencyBinCount );
-	analyser.getByteFrequencyData( freqDomain );
+	analyser.getByteTimeDomainData( freqDomain );
 	// console.log(freqDomain);
 
-	ctx.clearRect( 0, 0, canvas.width, canvas.height );
-	ctx.fillStyle = "#00ccff";
+	ctx.fillStyle = "rgba(0,0,0,0.03)";
+	var hue = Math.sin( analyser.context.currentTime * 0.05 ) * 360;
+	ctx.strokeStyle = "hsla(" + hue + ", 80%, 50%, 0.8)";
+	// ctx.setLineDash([2, 2]);
+	ctx.lineWidth = 2;
+
+
+	// ctx.clearRect( 0, 0, canvas.width, canvas.height );
+	ctx.fillRect( 0, 0, canvas.width, canvas.height );
+
+	ctx.beginPath();
+	ctx.moveTo( 0, Math.round( canvas.height / 2 ) );
 
 	var barWidth = Math.round(canvas.width / analyser.frequencyBinCount);
 
-	for (var i = 0; i < analyser.frequencyBinCount; i++) {
-		var percent = freqDomain[i] / 256; // Not sure what 256 is yet, but it doesn't change when we change DETAIL...
+	for (var i = 0; i < ( analyser.frequencyBinCount - 1 ); i++) {
+		// Not sure what 256 is yet, but it doesn't change when we change DETAIL...
+		// wait ... maybe it has to do with Uint8 in the array. 0-256... hmm...
+		var percent = freqDomain[i] / 256;
 		var barHeight = canvas.height * percent;
-		ctx.fillRect( i * barWidth, canvas.height, barWidth, barHeight * -1 );
+
+		ctx.lineTo( (i + 1) * barWidth, barHeight );
+		// ctx.fillRect( i * barWidth, canvas.height, barWidth, barHeight * -1 );
 	};
+	ctx.lineTo( canvas.width, Math.round( canvas.height / 2 ) );
 
-
+	ctx.stroke();
+	ctx.closePath();
 
 	requestAnimationFrame(loop);
 }
