@@ -2,7 +2,7 @@
 var DETAIL = 256;
 
 // Path to the mp3 file we want to play
-var SOUNDFILE = "sound.mp3"
+var SOUNDFILE = "rhino.mp3"
 
 // Audio API vars
 var AudioContext = AudioContext || webkitAudioContext;
