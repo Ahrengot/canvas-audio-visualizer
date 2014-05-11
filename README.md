@@ -1,4 +1,4 @@
-canvas-audio-visualizer
+Audio visualizer
 =======================
 
 A mashup of HTML5 canvas and the new Web Audio API
