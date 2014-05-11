@@ -40,7 +40,7 @@ function playSound() {
 function createSoundAnalyser() {
 	analyser = context.createAnalyser();
 	analyser.fftSize = DETAIL;
-	analyser.smoothingTimeConstant = 0.5;
+	analyser.smoothingTimeConstant = 0.8;
 
 	source.connect( analyser );
 	analyser.connect( context.destination );
