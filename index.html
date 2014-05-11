@@ -1,7 +1,8 @@
 <!doctype html>
-<html class="no-js" xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml" lang="en-US">
+<html>
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
 	<title>Web Audio API</title>
 
 	<style type="text/css">
@@ -13,15 +14,27 @@
 		body { background: black; color: #999; font-family: sans-serif; }
 		h1 { color: #333; }
 
-		.preloader {
+		.preloader, .play {
 			width: 300px;
+			height: 50px;
+
 			position: absolute;
-			top: 30%;
+			top: 50%;
 			left: 50%;
+
 			margin-left: -150px;
+			margin-top: -25px;
+
 			text-align: center;
 			font-size: 1.3em;
-			font-style: italic;
+		}
+
+		.play {
+			display: none;
+			background: #00ccff;
+			border: none;
+			border-radius: 0.3em;
+			color: #1C5A5A;
 		}
 
 		#readout {
@@ -37,11 +50,13 @@
 	<div id="container">
 		<main>
 			<p class="preloader">Loading sound&hellip;</p>
+			<button class="play">Start visualizer</button>
 			<canvas id="readout" width="600" height="200"></canvas>
 		</main>
 
 	</div>
 
 	<script src="script.js"></script>
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 </body>
 </html>

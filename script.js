@@ -1,40 +1,24 @@
-// Helpers etc.
-var DETAIL = 1024;
+// Integer between 32-2048. Change this to modify the defail of the graph.
+var DETAIL = 256;
 
-var removePreloader = function() {
-	document.querySelector(".preloader").remove();
-}
+// Path to the mp3 file we want to play
+var SOUNDFILE = "sound.mp3"
 
+// Audio API vars
 var AudioContext = AudioContext || webkitAudioContext;
-
-// Actual audio API code
 var source, buffer, analyser;
-
 var context = new AudioContext();
-var request = new XMLHttpRequest();
-request.open( 'GET', 'sound.mp3', true );
-request.responseType = 'arraybuffer';
 
 // Canvas
 var canvas = document.getElementById( "readout" );
 var ctx = canvas.getContext( "2d" );
 
-var updateCanvasSize = function() {
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-}
-
-window.addEventListener( "resize", updateCanvasSize );
-updateCanvasSize();
-
-function playSound() {
-	// buffer source has to be recreated for every "play"
+function createBuffer() {
 	source = context.createBufferSource();
 	source.buffer = buffer;
 	source.connect( context.destination );
 
-	source.start(0);
-	removePreloader();
+	document.querySelector(".preloader").remove();
 }
 
 function createSoundAnalyser() {
@@ -49,7 +33,6 @@ function createSoundAnalyser() {
 function loop() {
 	var freqDomain = new Uint8Array( analyser.frequencyBinCount );
 	analyser.getByteTimeDomainData( freqDomain );
-	// console.log(freqDomain);
 
 	ctx.fillStyle = "rgba(0,0,0,0.03)";
 	var hue = Math.sin( analyser.context.currentTime * 0.05 ) * 360;
@@ -68,12 +51,12 @@ function loop() {
 
 	for (var i = 0; i < ( analyser.frequencyBinCount - 1 ); i++) {
 		// Not sure what 256 is yet, but it doesn't change when we change DETAIL...
-		// wait ... maybe it has to do with Uint8 in the array. 0-256... hmm...
+		// ... maybe it has to do with Uint8 in the array. Maybe values in Uint8 array only
+		// exist between 0-256... hmm...
 		var percent = freqDomain[i] / 256;
 		var barHeight = canvas.height * percent;
 
 		ctx.lineTo( (i + 1) * barWidth, barHeight );
-		// ctx.fillRect( i * barWidth, canvas.height, barWidth, barHeight * -1 );
 	};
 	ctx.lineTo( canvas.width, Math.round( canvas.height / 2 ) );
 
@@ -83,15 +66,48 @@ function loop() {
 	requestAnimationFrame(loop);
 }
 
+function handleSoundLoaded() {
+	var playBtn = document.querySelector( "button.play" );
+	playBtn.style.display = "block";
+
+	createBuffer();
+	createSoundAnalyser();
+
+	// iOS won't let us play media without a user interaction. Guessing it's the same for Android,
+	// so add a button for touch screens.
+	if ( 'ontouchstart' in document.documentElement ) {
+		playBtn.addEventListener("click", function(e) {
+			this.remove();
+			source.start(0);
+			loop();
+		});
+	// For desktop, we just autoplay.
+	} else {
+		playBtn.remove();
+		source.start(0);
+		loop();
+	}
+}
+
+// Prep an AJAX request for the sound file
+var request = new XMLHttpRequest();
+request.open( 'GET', SOUNDFILE, true );
+request.responseType = 'arraybuffer';
 request.onload = function() {
 	context.decodeAudioData(request.response, function( b ) {
 		buffer = b;
-		playSound();
-		createSoundAnalyser();
-		loop();
+		handleSoundLoaded();
 	}, function() {
 		alert( 'Error decoding audio file' );
 	});
 
 };
 request.send();
+
+// Handle window resize
+var updateCanvasSize = function() {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+}
+window.addEventListener( "resize", updateCanvasSize );
+updateCanvasSize();
